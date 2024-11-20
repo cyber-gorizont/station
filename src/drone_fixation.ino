@@ -42,22 +42,16 @@ Servo servo1;  // create servo object to control a servo 1
 Servo servo2;  // create servo object to control a servo 2
 // 16 servo objects can be created on the ESP32
 
-int pos = 0;    // variable to store the servo position
+static const int gerConPin = 12;
+static const int servo1Pin = 14;
+static const int servo2Pin = 27;
+static int isDroneLanded = 0;
+static bool isDroneFixed = false;
+static int pos = 0;    // variable to store the servo position
 // Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
 // Possible PWM GPIO pins on the ESP32-S2: 0(used by on-board button),1-17,18(used by on-board LED),19-21,26,33-42
 // Possible PWM GPIO pins on the ESP32-S3: 0(used by on-board button),1-21,35-45,47,48(used by on-board LED)
 // Possible PWM GPIO pins on the ESP32-C3: 0(used by on-board button),1-7,8(used by on-board LED),9-10,18-21
-#if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)
-const int servoPin = 17;
-#elif defined(CONFIG_IDF_TARGET_ESP32C3)
-const int servoPin = 7;
-#else
-const int servo1Pin = 14;
-const int servo2Pin = 27;
-#endif
-const int gerConPin = 12;
-int isLanded = 0;
-bool done = false;
 
 void setup() {
   Serial.begin(115200);
@@ -69,30 +63,40 @@ void setup() {
 	ESP32PWM::allocateTimer(3);
 	servo1.setPeriodHertz(50);    // standard 50 hz servo
   servo2.setPeriodHertz(50);    // standard 50 hz servo
-	servo1.attach(servo1Pin, 1000, 2000); // attaches the servo on pin 18 to the servo object
-  servo2.attach(servo2Pin, 1000, 2000); // attaches the servo on pin 18 to the servo object
+	//servo1.attach(servo1Pin);     // attaches the servo on pin 14 to the servo 1 object
+  //servo2.attach(servo2Pin);     // attaches the servo on pin 27 to the servo 2 object
+	servo1.attach(servo1Pin, 1000, 2000); // attaches the servo on pin 14 to the servo 1 object
+  servo2.attach(servo2Pin, 1000, 2000); // attaches the servo on pin 27 to the servo 2 object
 	// using default min/max of 1000us and 2000us
 	// different servos may require different min/max settings
 	// for an accurate 0 to 180 sweep
-  isLanded = digitalRead(gerConPin);
 }
 
 void loop() {
-  Serial.println(isLanded);
-  if (isLanded != 0 && done == false) {
-	  for (pos = 0; pos <= 180; pos++) { // goes from 0 degrees to 180 degrees
-		  // in steps of 1 degree
-		  servo1.write(pos);    // tell servo 1 to go to position in variable 'pos'
-      servo2.write(pos);    // tell servo 2 to go to position in variable 'pos'
-		  delay(15);             // waits 15ms for the servo to reach the position
-	  }
-    done = true;
-  } else if (isLanded = 0 && done == true) {
-	  for (pos = 180; pos >= 0; pos--) { // goes from 180 degrees to 0 degrees
-		  servo1.write(pos);    // tell servo 1 to go to position in variable 'pos'
-      servo2.write(pos);    // tell servo 2 to go to position in variable 'pos'
-		  delay(15);             // waits 15ms for the servo to reach the position
-      done = false;
-    }
+  isDroneLanded = digitalRead(gerConPin);
+  Serial.println(isDroneLanded);
+  if (isDroneLanded == 1 && isDroneFixed == false) {
+    Serial.println("Turning servos to 180 degrees...");
+    servo1.write(0);      // tell servo 1 to go to position to 180 degrees
+    servo2.write(0);      // tell servo 2 to go to position to 180 degrees
+    delay(1000);
+    Serial.println("Stopping servos...");
+    servo1.write(90);        // stop servo 1
+    servo2.write(90);        // stop servo 2
+    isDroneFixed = true;
+    Serial.println("Servos turned to 180 degrees...");
+    delay(5000);
+  } else if (isDroneLanded = 1 && isDroneFixed == true) {
+    Serial.println("Turning servos to 0 degrees...");
+    servo1.write(180);      // tell servo 1 to go to position to 0 degrees
+    servo2.write(180);      // tell servo 2 to go to position to 0 degrees
+    delay(1000);
+    Serial.println("Stopping servos...");
+    servo1.write(90);        // stop servo 1
+    servo2.write(90);        // stop servo 2
+    isDroneFixed = false;
+    Serial.println("Servos turned to 0");
+    delay(5000);
 	}
+  delay(10);
 }
