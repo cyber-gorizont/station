@@ -29,10 +29,3 @@ $ pio run
 ```
 $ pio run --target upload
 ```
-
-6. After first flashing you can upload firmware wirelessly in your browser or using curl command
-
-```
-$ curl -X POST -F "firmware=@path/to/your/firmware.bin" http://<ESP32_IP>/update
-```
-
