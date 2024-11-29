@@ -1,30 +1,30 @@
 # station
 
-Autonomous battery-changing system for UAV’s lifelong flight
+Система автоматической замены аккумулятора для беспрерывной работы БВС
 
-## 🛠 Getting Started
+## 🛠 Начало работы
 
-1. [Install PlatformIO Core](https://docs.platformio.org/page/core.html)
+1. [Установите PlatformIO Core](https://docs.platformio.org/page/core.html)
 
-2. Clone the repository:
+2. Клонируйте репозиторий:
 
 ```
 $ git clone https://github.com/cyber-gorizont/station.git
 ```
 
-3. Navigate to the project directory:
+3. Перейдите в каталог проекта:
 
 ```
 $ cd station/src
 ```
 
-4. Build the firmware:
+4. Соберите прошивку:
 
 ```
 $ pio run
 ```
 
-5. Upload the firmware
+5. Загрузите прошивку
 
 ```
 $ pio run --target upload
